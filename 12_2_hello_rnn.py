@@ -75,9 +75,13 @@ for epoch in range(100):
         hidden, output = model(hidden, input)
         val, idx = output.max(1)
         sys.stdout.write(idx2char[idx.data[0]])
-        loss += criterion(output, label)
-
-    print(", epoch: %d, loss: %1.3f" % (epoch + 1, loss.data[0]))
+        # https://github.com/spro/practical-pytorch/issues/106#issuecomment-397825206
+        # RuntimeError: dimension specified as 0 but tensor has no dimensions
+        # loss += criterion(output, label)
+        loss += criterion(output, label.unsqueeze(0))
+        
+    # print(", epoch: %d, loss: %1.3f" % (epoch + 1, loss.data[0]))
+    print(", epoch: %d, loss: %1.3f" % (epoch + 1, loss.data.item()))
 
     loss.backward()
     optimizer.step()
